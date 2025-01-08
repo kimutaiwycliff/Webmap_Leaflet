@@ -161,7 +161,14 @@ const Map = () => {
       },
       onEachFeature: (feature: any, layer: any) => {
         if (feature.geometry.type === 'Polygon') {
-          layer.bindPopup('I am a polygon');
+          layer
+            .bindPopup('I am a polygon')
+            .on('mouseover', (e: any) => {
+              e.target.openPopup();
+            })
+            .on('mouseout', (e: any) => {
+              e.target.closePopup();
+            });
         }
       },
     });
@@ -191,7 +198,7 @@ const Map = () => {
     };
   }, []);
 
-  return <div id="map" style={{ height: '100vh', width: '100%' }}></div>;
+  return <div id="map" className="h-screen w-full z-10"></div>;
 };
 
 export default Map;

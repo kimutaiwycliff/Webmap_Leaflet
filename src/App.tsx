@@ -6,10 +6,14 @@ const App = ({ children }: any) => {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       {children}
-      <div className="">
+      <div className="absolute right-4 top-4 z-20">
+        <ModeToggle />
+      </div>
+      <div className="relative">
         <Map />
       </div>
-      <ModeToggle />
+
+
     </ThemeProvider>
   );
 };
