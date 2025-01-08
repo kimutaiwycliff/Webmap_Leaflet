@@ -182,9 +182,11 @@ const Map = () => {
             .bindPopup('I am a polygon')
             .on('mouseover', (e: any) => {
               e.target.openPopup();
+              e.target.setStyle({ color: 'red', fillColor: 'blue'});
             })
             .on('mouseout', (e: any) => {
               e.target.closePopup();
+              e.target.setStyle({ color: '#000', fillColor: '#000' });
             });
         }
       },
@@ -242,7 +244,7 @@ const Map = () => {
           placeholder="Search by geometry type (Point, LineString, Polygon)"
           value={searchTerm}
           onChange={handleSearch}
-          className="text-black"
+          className="text-black font-light"
         />
       </div>
       <div id="map" className="h-full w-full z-10"></div>
