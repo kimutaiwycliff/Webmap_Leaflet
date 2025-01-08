@@ -141,6 +141,8 @@ const Map = () => {
       },
     ],
   };
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredData, setFilteredData] = useState(data);
   const icon = L.icon({
     iconUrl: 'globe.svg',
     iconSize: [32, 37],
@@ -151,10 +153,20 @@ const Map = () => {
     // Initialize the map
     const map = L.map('map').setView(
       [-1.2983702370082568, 36.88112302280874],
-      13
+      8
     );
+    const initialBounds = map.getBounds();
+    // Add OpenStreetMap tiles
+    const osmTiles = L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }
+    );
+    osmTiles.addTo(map);
 
-    const geoJson = L.geoJSON(data, {
+    const geoJson = L.geoJSON(filteredData, {
       style: (feature: any) => {
         console.log(feature);
         return { color: '#000', weight: 0.5 };
@@ -178,27 +190,35 @@ const Map = () => {
       },
     });
 
-    // Add OpenStreetMap tiles
-    const osmTiles = L.tileLayer(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }
-    );
-
-    osmTiles.addTo(map);
     if (layersVisible) {
       geoJson.addTo(map);
     }
 
-    map.fitBounds(geoJson.getBounds());
-
+    const bounds = geoJson.getBounds();
+    if (bounds.isValid()) {
+      map.fitBounds(bounds);
+    } else {
+      map.fitBounds(initialBounds);
+    }
     // Clean up map instance on component unmount
     return () => {
       map.remove();
     };
-  }, [layersVisible]);
+  }, [filteredData, layersVisible]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value.toLowerCase();
+    setSearchTerm(value);
+
+    const filtered = {
+      ...data,
+      features: data.features.filter((feature: any) =>
+        feature.geometry.type.toLowerCase().includes(value)
+      ),
+    };
+
+    setFilteredData(filtered);
+  };
 
   const toggleLayers = () => {
     setLayersVisible(!layersVisible);
@@ -207,7 +227,9 @@ const Map = () => {
   return (
     <div className="relative h-screen w-full">
       <div className="absolute  space-y-3 bottom-6 right-2 z-30 p-4 bg-slate-50 bg-opacity-60 min-h-[200px] min-w-[200px] rounded-lg border">
-        <p className="text-black font-bold underline-offset-auto text-center">Map of Nairobi</p>
+        <p className="text-black font-bold underline-offset-auto text-center">
+          Map of Nairobi
+        </p>
 
         <Button
           className=" flex justify-items-end bg-slate-800 text-white hover:bg-slate-600"
@@ -215,6 +237,13 @@ const Map = () => {
         >
           {layersVisible ? 'Hide' : 'Show'} layers
         </Button>
+        <input
+          type="text"
+          placeholder="Search by geometry type (Point, LineString, Polygon)"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="text-black"
+        />
       </div>
       <div id="map" className="h-full w-full z-10"></div>
     </div>
