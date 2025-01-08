@@ -156,9 +156,12 @@ const Map = () => {
 
     const geoJson = L.geoJSON(data, {
       style: (feature: any) => {
+        console.log(feature);
         return { color: '#000', weight: 0.5 };
       },
       pointToLayer: (feature: any, latlng: any) => {
+        console.log(feature);
+
         return L.marker(latlng, { icon }).bindPopup('I am a point');
       },
       onEachFeature: (feature: any, layer: any) => {
@@ -203,12 +206,16 @@ const Map = () => {
 
   return (
     <div className="relative h-screen w-full">
-      <Button
-        className="bg-slate-800 text-white z-30 absolute bottom-2 left-2 hover:bg-slate-600"
-        onClick={toggleLayers}
-      >
-        {layersVisible ? 'Hide' : 'Show'} layers
-      </Button>
+      <div className="absolute  space-y-3 bottom-6 right-2 z-30 p-4 bg-slate-50 bg-opacity-60 min-h-[200px] min-w-[200px] rounded-lg border">
+        <p className="text-black font-bold underline-offset-auto text-center">Map of Nairobi</p>
+
+        <Button
+          className=" flex justify-items-end bg-slate-800 text-white hover:bg-slate-600"
+          onClick={toggleLayers}
+        >
+          {layersVisible ? 'Hide' : 'Show'} layers
+        </Button>
+      </div>
       <div id="map" className="h-full w-full z-10"></div>
     </div>
   );
