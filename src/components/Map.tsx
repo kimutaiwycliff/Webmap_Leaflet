@@ -1,8 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Button } from './ui/button';
 
 const Map = () => {
+  const [layersVisible, setLayersVisible] = useState(true);
   const data: any = {
     type: 'FeatureCollection',
     features: [
@@ -172,7 +174,6 @@ const Map = () => {
         }
       },
     });
-    geoJson.addTo(map);
 
     // Add OpenStreetMap tiles
     const osmTiles = L.tileLayer(
@@ -184,11 +185,9 @@ const Map = () => {
     );
 
     osmTiles.addTo(map);
-
-    // Add a marker with a popup
-    L.marker([-1.2983702370082568, 36.88112302280874], { icon })
-      .addTo(map)
-      .bindPopup('<p>Hello world!<br />This is a nice popup.</p>');
+    if (layersVisible) {
+      geoJson.addTo(map);
+    }
 
     map.fitBounds(geoJson.getBounds());
 
@@ -196,9 +195,23 @@ const Map = () => {
     return () => {
       map.remove();
     };
-  }, []);
+  }, [layersVisible]);
 
-  return <div id="map" className="h-screen w-full z-10"></div>;
+  const toggleLayers = () => {
+    setLayersVisible(!layersVisible);
+  };
+
+  return (
+    <div className="relative h-screen w-full">
+      <Button
+        className="bg-slate-800 text-white z-30 absolute bottom-2 left-2 hover:bg-slate-600"
+        onClick={toggleLayers}
+      >
+        {layersVisible ? 'Hide' : 'Show'} layers
+      </Button>
+      <div id="map" className="h-full w-full z-10"></div>
+    </div>
+  );
 };
 
 export default Map;
