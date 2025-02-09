@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Button } from './ui/button';
+import { fetchData } from '@/lib/actions';
 
 const Map = () => {
   const [layersVisible, setLayersVisible] = useState(true);
@@ -141,8 +142,17 @@ const Map = () => {
       },
     ],
   };
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredData, setFilteredData] = useState(data);
+  const [filteredData, setFilteredData] = useState(null);
+  useEffect(() => {
+    const fetchDataAndSetState = async () => {
+      const territories = await fetchData();
+      setFilteredData(territories);
+    };
+
+    fetchDataAndSetState();
+  }, []);
   const icon = L.icon({
     iconUrl: 'globe.svg',
     iconSize: [32, 37],
@@ -182,7 +192,7 @@ const Map = () => {
             .bindPopup('I am a polygon')
             .on('mouseover', (e: any) => {
               e.target.openPopup();
-              e.target.setStyle({ color: 'red', fillColor: 'blue'});
+              e.target.setStyle({ color: 'red', fillColor: 'blue' });
             })
             .on('mouseout', (e: any) => {
               e.target.closePopup();
@@ -244,7 +254,7 @@ const Map = () => {
           placeholder="Search by geometry type (Point, LineString, Polygon)"
           value={searchTerm}
           onChange={handleSearch}
-          className="text-black font-light"
+          className="text-black font-light text-sm"
         />
       </div>
       <div id="map" className="h-full w-full z-10"></div>
