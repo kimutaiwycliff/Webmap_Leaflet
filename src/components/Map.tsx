@@ -187,12 +187,18 @@ const Map = () => {
         return L.marker(latlng, { icon }).bindPopup('I am a point');
       },
       onEachFeature: (feature: any, layer: any) => {
-        if (feature.geometry.type === 'Polygon') {
+        if (feature.geometry.type === 'MultiPolygon') {
           layer
-            .bindPopup('I am a polygon')
+            .bindPopup(`${feature.properties.Name}`).setStyle({
+              color: `${feature.properties.color}`,
+              fillColor: `${feature.properties.color}`,
+            })
             .on('mouseover', (e: any) => {
               e.target.openPopup();
-              e.target.setStyle({ color: 'red', fillColor: 'blue' });
+              e.target.setStyle({
+                color: `${feature.properties.color}`,
+                fillColor: `${feature.properties.color}`,
+              });
             })
             .on('mouseout', (e: any) => {
               e.target.closePopup();
@@ -208,7 +214,7 @@ const Map = () => {
 
     const bounds = geoJson.getBounds();
     if (bounds.isValid()) {
-      map.fitBounds(bounds);
+      map.fitBounds(initialBounds);
     } else {
       map.fitBounds(initialBounds);
     }
