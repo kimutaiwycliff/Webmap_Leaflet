@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Button } from './ui/button';
 import { fetchData } from '@/lib/actions';
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 
 const Map = () => {
   const [layersVisible, setLayersVisible] = useState(true);
@@ -175,6 +176,24 @@ const Map = () => {
       }
     );
     osmTiles.addTo(map);
+    // Initialize the OpenStreetMap provider
+    const provider = new OpenStreetMapProvider();
+
+    // Create the search control
+    // @ts-ignore
+    const searchControl = new GeoSearchControl({
+      provider: provider, // Set provider
+      style: 'button', // Optional: 'bar' or 'button'
+      showMarker: true, // Show a marker on search
+      marker: {
+        draggable: false, // Allow dragging the marker
+      },
+      autoClose: false, // Close results after selection
+      retainZoomLevel: false, // Maintain zoom level after search
+    });
+
+    // Add search control to the map
+    map.addControl(searchControl);
 
     const geoJson = L.geoJSON(filteredData, {
       style: (feature: any) => {
@@ -189,7 +208,8 @@ const Map = () => {
       onEachFeature: (feature: any, layer: any) => {
         if (feature.geometry.type === 'MultiPolygon') {
           layer
-            .bindPopup(`${feature.properties.Name}`).setStyle({
+            .bindPopup(`${feature.properties.Name}`)
+            .setStyle({
               color: `${feature.properties.color}`,
               fillColor: `${feature.properties.color}`,
             })
